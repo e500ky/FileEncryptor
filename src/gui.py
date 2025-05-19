@@ -15,10 +15,8 @@ class FileEncryptorGUI():
         self.window.iconbitmap("src/logo.ico")
         self.window.resizable(False, False)
 
-        # Tema ayarları
         ctk.set_appearance_mode("dark")
         
-        # Pencere arka plan rengini ayarla
         self.window.configure(bg="#1a1a1a")
         
         self.encryptor = TextEncryptor()
@@ -29,24 +27,18 @@ class FileEncryptorGUI():
         self._setup_drag_drop()
 
     def _clear_status(self):
-        """Durum mesajını temizler"""
         self.status_label.configure(text="")
         self.status_timer = None
 
     def _update_status(self, message: str, duration: int = 3000):
-        """Durum mesajını günceller ve belirli süre sonra temizler"""
         self.status_label.configure(text=message)
         
-        # Önceki zamanlayıcıyı iptal et
         if self.status_timer:
             self.window.after_cancel(self.status_timer)
         
-        # Yeni zamanlayıcı ayarla
         self.status_timer = self.window.after(duration, self._clear_status)
 
     def _setup_ui(self):
-        """Arayüz bileşenlerini oluşturur"""
-        # Ana frame
         self.main_frame = ctk.CTkFrame(
             self.window,
             fg_color="transparent",
@@ -54,7 +46,6 @@ class FileEncryptorGUI():
         )
         self.main_frame.pack(fill="both", expand=True)
         
-        # İçerik frame'i
         self.content_frame = ctk.CTkFrame(
             self.main_frame,
             fg_color="#2b2b2b",
@@ -62,7 +53,6 @@ class FileEncryptorGUI():
         )
         self.content_frame.pack(fill="both", expand=True, padx=15, pady=15)
         
-        # Başlık
         self.title_label = ctk.CTkLabel(
             self.content_frame,
             text="TXT Dosya Şifreleyici",
@@ -71,7 +61,6 @@ class FileEncryptorGUI():
         )
         self.title_label.pack(pady=(30, 20))
         
-        # Sürükle-bırak alanı
         self.drop_frame = ctk.CTkFrame(
             self.content_frame,
             fg_color="#1f2937",
@@ -88,7 +77,6 @@ class FileEncryptorGUI():
         )
         self.drop_label.pack(pady=20)
         
-        # Dosya seçme butonu
         self.select_button = ctk.CTkButton(
             self.content_frame,
             text="Dosya Seç",
@@ -101,14 +89,12 @@ class FileEncryptorGUI():
         )
         self.select_button.pack(pady=10)
         
-        # Dosya bilgisi frame'i
         self.file_info_frame = ctk.CTkFrame(
             self.content_frame,
             fg_color="transparent"
         )
         self.file_info_frame.pack(pady=10)
         
-        # Dosya kaldırma butonu
         self.remove_button = ctk.CTkButton(
             self.file_info_frame,
             text="✕",
@@ -124,7 +110,6 @@ class FileEncryptorGUI():
         self.remove_button.pack(side="left", padx=10)
         self.remove_button.pack_forget()
        
-        # Dosya yolu etiketi
         self.file_label = ctk.CTkLabel(
             self.file_info_frame,
             text="Henüz dosya seçilmedi",
@@ -133,14 +118,12 @@ class FileEncryptorGUI():
         )
         self.file_label.pack(side="left", padx=(1, 0))
         
-        # Şifreleme anahtarı girişi
         self.key_frame = ctk.CTkFrame(
             self.content_frame,
             fg_color="transparent"
         )
         self.key_frame.pack(fill="x", padx=40, pady=20)
         
-        # Anahtar girişi için container frame
         self.key_container = ctk.CTkFrame(
             self.key_frame,
             fg_color="transparent"
@@ -168,14 +151,12 @@ class FileEncryptorGUI():
         )
         self.key_entry.pack(side="left", padx=5)
         
-        # Butonlar için frame
         self.button_frame = ctk.CTkFrame(
             self.content_frame,
             fg_color="transparent"
         )
         self.button_frame.pack(pady=20)
         
-        # Şifreleme butonu
         self.encrypt_button = ctk.CTkButton(
             self.button_frame,
             text="Şifrele",
@@ -190,7 +171,6 @@ class FileEncryptorGUI():
         )
         self.encrypt_button.pack(side="left", padx=10)
         
-        # Şifre çözme butonu
         self.decrypt_button = ctk.CTkButton(
             self.button_frame,
             text="Şifre Çöz",
@@ -205,7 +185,6 @@ class FileEncryptorGUI():
         )
         self.decrypt_button.pack(side="left", padx=10)
         
-        # Durum etiketi
         self.status_label = ctk.CTkLabel(
             self.content_frame,
             text="",
@@ -215,23 +194,20 @@ class FileEncryptorGUI():
         self.status_label.pack(pady=10)
 
     def _setup_drag_drop(self):
-        """Sürükle-bırak özelliğini ayarlar"""
         self.drop_frame.drop_target_register(DND_FILES)
         self.drop_frame.dnd_bind('<<Drop>>', self._handle_drop)
 
     def _handle_drop(self, event):
-        """Sürüklenen dosyayı işler"""
         file_path = event.data
-        # Windows'ta dosya yolu düzeltmesi
         if file_path.startswith('{'):
             file_path = file_path[1:-1]
         if self.file_handler.is_valid_txt_file(file_path):
             self._load_file(file_path)
+            
         else:
             messagebox.showerror("Hata", "Lütfen geçerli bir .txt dosyası seçin!")
 
     def _select_file(self):
-        """Dosya seçme dialogunu açar"""
         file_path = filedialog.askopenfilename(
             filetypes=[("Text files", "*.txt")]
         )
@@ -241,7 +217,6 @@ class FileEncryptorGUI():
         self.remove_button.pack(side="left", padx=10)
 
     def _remove_file(self):
-        """Seçili dosyayı kaldırır"""
         self.file_handler.clear()
         self.file_label.configure(text="Henüz dosya seçilmedi")
         self.encrypt_button.configure(state="disabled")
@@ -251,32 +226,42 @@ class FileEncryptorGUI():
         self.remove_button.pack_forget()
 
     def _load_file(self, file_path: str):
-        """Dosyayı yükler ve arayüzü günceller"""
         if self.file_handler.read_file(file_path):
             self.file_label.configure(text=os.path.basename(file_path))
-            self.encrypt_button.configure(state="normal")
+            encrypted = False
+            try:
+                from .encryption import TextEncryptor
+                encryptor = TextEncryptor()
+                keyfile_path = encryptor._get_keyfile_path(file_path)
+                if os.path.exists(keyfile_path):
+                    encrypted = True
+            except Exception:
+                encrypted = False
+            if encrypted:
+                self.encrypt_button.configure(state="disabled")
+                self._update_status("Bu dosya zaten şifrelenmiş! Tekrar şifrelenemez.")
+            else:
+                self.encrypt_button.configure(state="normal")
             self.decrypt_button.configure(state="normal")
+            self.remove_button.pack(side="left", padx=10)
             self.remove_button.configure(state="normal")
             self._update_status("Dosya başarıyla yüklendi")
         else:
             messagebox.showerror("Hata", "Dosya okunamadı!")
 
     def _encrypt_file(self):
-        """Dosyayı şifreler"""
         key = self.key_entry.get()
         if not key:
             messagebox.showerror("Hata", "Lütfen bir şifreleme anahtarı girin!")
             return
         
         file_path = self.file_handler.current_file
-        self.encryptor.set_key(key, file_path)  # Sadece şifrelerken anahtarı kaydet
+        self.encryptor.set_key(key, file_path)
         
-        # Dosya zaten şifreliyse orijinal içeriği kullan
         if self.file_handler.is_file_encrypted():
             content = self.file_handler.get_original_content()
         else:
             content = self.file_handler.get_file_content()
-            # Orijinal içeriği kaydet
             self.file_handler.original_content = content
         
         if content:
@@ -287,26 +272,24 @@ class FileEncryptorGUI():
                     self.file_handler.set_encrypted(True)
                     self._update_status("Dosya başarıyla şifrelendi!")
                     messagebox.showinfo("Başarılı", "Dosya başarıyla şifrelendi!")
+                    self.encrypt_button.configure(state="disabled")
                 else:
                     messagebox.showerror("Hata", "Dosya yazılamadı!")
             except Exception as e:
                 messagebox.showerror("Hata", f"Şifreleme hatası: {str(e)}")
 
     def _decrypt_file(self):
-        """Dosyayı şifresini çözer"""
         key = self.key_entry.get()
         if not key:
             messagebox.showerror("Hata", "Lütfen bir şifreleme anahtarı girin!")
             return
         
         file_path = self.file_handler.current_file
-        self.encryptor.key = key  # Sadece bellekte anahtarı ayarla, dosyaya kaydetme!
+        self.encryptor.key = key
         
         if self.file_handler.is_file_encrypted():
-            # Şifrelenmiş dosyayı çöz
             content = self.file_handler.get_file_content()
         else:
-            # Dosya şifreli değilse orijinal içeriği kullan
             content = self.file_handler.get_original_content()
         
         if content:
@@ -317,6 +300,7 @@ class FileEncryptorGUI():
                     self.file_handler.set_encrypted(False)
                     self._update_status("Dosya başarıyla çözüldü!")
                     messagebox.showinfo("Başarılı", "Dosya başarıyla çözüldü!")
+                    self.encrypt_button.configure(state="normal")
                 else:
                     messagebox.showerror("Hata", "Dosya yazılamadı!")
             except Exception as e:
@@ -325,5 +309,4 @@ class FileEncryptorGUI():
                 messagebox.showerror("Hata", f"Anahtar uyuşmuyor: {str(ve)}")
 
     def run(self):
-        """Uygulamayı başlatır"""
         self.window.mainloop()
